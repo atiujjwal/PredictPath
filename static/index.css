@@ -1,0 +1,546 @@
+/* :root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --bg-overlay: rgba(15, 23, 42, 0.85);
+  --glass: rgba(255, 255, 255, 0.95);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("https://images.wallpaperscraft.com/image/single/street_road_traffic_130216_3840x2400.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding: 20px;
+}
+
+.main-wrapper {
+  width: 100%;
+  max-width: 800px;
+  background: var(--glass);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: var(--primary);
+  padding: 24px;
+  text-align: center;
+  color: white;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+header p {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+form {
+  padding: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group.full-width {
+  grid-column: span 2;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.unit {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+input,
+select {
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  background: #fff;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.submit-btn {
+  grid-column: span 2;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  background: var(--primary-hover);
+}
+
+.prediction-result {
+  grid-column: span 2;
+  text-align: center;
+  background: #ecfdf5;
+  color: #065f46;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #10b981;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+@media (max-width: 640px) {
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group.full-width {
+    grid-column: span 1;
+  }
+} */
+
+
+:root {
+  --neon-blue: #00f3ff;
+  --neon-pink: #ff00ff;
+  --hud-bg: rgba(10, 15, 30, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  font-family: 'Rajdhani', sans-serif;
+  color: white;
+  background: #000;
+}
+
+/* --- 3D World --- */
+.world {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  perspective: 1000px;
+  overflow: hidden;
+  transition: filter 1s ease;
+}
+
+.sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
+  z-index: 1;
+  transition: background 1s ease;
+}
+
+.sun-moon {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #ffdd00;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 80px #ffaa00;
+  z-index: 2;
+  transition: all 1s ease;
+}
+
+.ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #1a0b2e;
+  transform-style: preserve-3d;
+  z-index: 3;
+}
+
+.road {
+  position: absolute;
+  left: 50%;
+  bottom: -100px;
+  width: 400px;
+  height: 200%;
+  background: #222;
+  transform: translateX(-50%) rotateX(60deg);
+  transform-origin: bottom center;
+  border-left: 5px solid var(--neon-pink);
+  border-right: 5px solid var(--neon-pink);
+  box-shadow: 0 0 20px var(--neon-pink);
+  overflow: hidden;
+}
+
+/* Moving Grid Lines */
+.grid-lines {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  left: -50%;
+  top: 0;
+  background-image:
+    linear-gradient(var(--neon-blue) 1px, transparent 1px),
+    linear-gradient(90deg, var(--neon-blue) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: center bottom;
+  transform: rotateX(60deg);
+  transform-origin: bottom center;
+  animation: moveGrid 1s linear infinite;
+  opacity: 0.2;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes moveGrid {
+  0% {
+    background-position: center 0;
+  }
+
+  100% {
+    background-position: center 50px;
+  }
+}
+
+.lane-markings {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 10px;
+  height: 100%;
+  background: repeating-linear-gradient(to bottom, #fff 0, #fff 50px, transparent 50px, transparent 100px);
+  transform: translateX(-50%);
+  animation: moveRoad 0.5s linear infinite;
+}
+
+@keyframes moveRoad {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 0 100px;
+  }
+}
+
+/* 3D Cars (CSS Blocks) */
+.car {
+  position: absolute;
+  width: 40px;
+  height: 60px;
+  background: red;
+  box-shadow: 0 0 10px red;
+  border-radius: 4px;
+}
+
+.car::before {
+  /* Headlights/Taillights */
+  content: '';
+  position: absolute;
+  top: -5px;
+  width: 100%;
+  height: 10px;
+  background: yellow;
+  box-shadow: 0 0 10px yellow;
+}
+
+.car-1 {
+  left: 20%;
+  animation: drive 3s linear infinite;
+  background: #00f3ff;
+  box-shadow: 0 0 15px #00f3ff;
+}
+
+.car-2 {
+  right: 20%;
+  animation: drive 4s linear infinite 1s;
+  background: #ff00ff;
+  box-shadow: 0 0 15px #ff00ff;
+}
+
+.car-3 {
+  left: 45%;
+  animation: drive 2.5s linear infinite 0.5s;
+  background: lime;
+}
+
+@keyframes drive {
+  0% {
+    top: -200px;
+    transform: scale(0.1);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 120%;
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+/* Night Mode Overrides */
+.night-mode .road {
+  background: #000;
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 30px var(--neon-blue);
+}
+
+.night-mode .sky {
+  background: #020024;
+}
+
+/* Weather Overlays */
+.weather-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.weather-overlay.rainy {
+  background: url('https://i.imgur.com/7Q3l9M6.png');
+  opacity: 0.3;
+  animation: rain 0.3s linear infinite;
+}
+
+.weather-overlay.snowy {
+  background: url('https://i.imgur.com/8Q3l9M6.png');
+  opacity: 0.5;
+  animation: snow 5s linear infinite;
+  filter: blur(2px);
+}
+
+.weather-overlay.foggy {
+  background: rgba(255, 255, 255, 0.4);
+  opacity: 1;
+  filter: blur(20px);
+}
+
+@keyframes rain {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 20px 100px;
+  }
+}
+
+@keyframes snow {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 100px 500px;
+  }
+}
+
+/* --- HUD Interface --- */
+.hud-container {
+  position: relative;
+  z-index: 20;
+  max-width: 900px;
+  margin: 5vh auto;
+  background: var(--hud-bg);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-top: 2px solid var(--neon-blue);
+  border-bottom: 2px solid var(--neon-pink);
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+}
+
+.highlight {
+  color: var(--neon-blue);
+  text-shadow: 0 0 10px var(--neon-blue);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border: 1px solid lime;
+  color: lime;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  border-radius: 4px;
+  box-shadow: 0 0 5px lime;
+}
+
+.control-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.module {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.module-header {
+  font-size: 0.8rem;
+  color: var(--neon-pink);
+  margin-bottom: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.split-group {
+  display: flex;
+  gap: 10px;
+}
+
+label {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  color: #ccc;
+}
+
+.unit {
+  font-size: 0.7rem;
+  color: #777;
+}
+
+input,
+select {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #444;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  transition: all 0.3s;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+/* Gamified Button */
+.submit-btn {
+  position: relative;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+  border: none;
+  padding: 15px;
+  width: 100%;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  overflow: hidden;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  transition: transform 0.2s;
+}
+
+.submit-btn:hover {
+  transform: scale(1.02);
+  filter: brightness(1.2);
+}
+
+/* Result Box */
+.prediction-result {
+  margin-top: 20px;
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid lime;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-value {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 10px lime;
+}

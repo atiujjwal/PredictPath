@@ -1,141 +1,477 @@
-<!DOCTYPE html>
-<html>
+<!-- <!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Traffic Volume Estimation</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&display=swap">
-  <style>
-    body {
-      background-image: url("https://images.wallpaperscraft.com/image/single/street_road_traffic_130216_3840x2400.jpg");
-      background-color: black;
-      color: white;
-      font-family: Poppins, sans-serif;
-      background-size: cover;
-    }
-    .login {
-      max-width: 400px;
-      margin: 0 auto;
-      text-align: center;
-      padding: 20px;
-      background-color: rgba(0, 0, 0, 0.5);
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    }
-    h1 {
-      font-size: 30px;
-    }
-    h2 {
-      font-size: 18px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input[type="number"] {
-      width: 94%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    select {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    img {
-      display: block;
-      margin: 20px auto;
-      max-width: 100%;
-      height: auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafficTelligence | Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
-  <div class="login">
-    <h1>Traffic Volume Estimation</h1>
-    <form action="/predict" method="post"> 
-      <h2>Please enter the following details</h2>
-      <label for="holiday">Holiday:</label>
-      <select id="holiday" name="holiday">
-        <option value ="" disabled selected hidden>Choose a Holiday</option>
-        <option value= 7>None</option>
-        <option value= 1>Columbus Day</option>
-        <option value= 10>Veterans Day</option>
-        <option value = 9>Thanksgiving Day</option>
-        <option value = 0>Christmas Day</option>
-        <option value = 6>New Years Day</option>
-        <option value = 11>Washingtons Birthday</option>
-        <option value = 5>Memorial Day</option>
-        <option value = 2>Independence Day</option>
-        <option value = 8>State Fair</option>
-        <option value = 3>Labor Day</option>
-        <option value = 4>Martin Luther King Jr Day</option>
-      </select><br>
-      <label>Temperature (in kelvin):</label>
-      <input type="number" name="temp" placeholder="Temperature" required="required"><br>
-      <label>Rain (in mm):</label>
-      <input type="number" min="0" max="1000" name="rain" placeholder="Rain" required="required"><br>
-      <label>Snow (in mm):</label>
-      <input type="number" min="0" max="15" name="snow" placeholder="Snow" required="required"><br>
-      <label for="weather">Weather:</label>
-      <select id="weather" name="weather">
-        <option value = "" disabled selected hidden>Choose a weather condition</option>
-        <option value = "1">Clouds</option>
-        <option value = "0">Clear</option>
-        <option value = 6>Rain</option>
-        <option value = 2>Drizzle</option>
-        <option value = 5>Mist</option>
-        <option value = 4>Haze</option>
-        <option value = 3>Fog</option>
-        <option value = 10>Thunderstorm</option>
-        <option value = 8>Snow</option>
-        <option value = 9>Squall</option>
-        <option value = 7>Smoke</option>
-      </select><br>
-      <label>Year:</label>
-      <input type="number" name="year" placeholder="Year" required="required"><br>
-      <label>Month:</label>
-      <select id="Month" name="Month">
-        <option value="" disabled selected hidden>Choose a month</option>
-        <option value= 1>January</option>
-        <option value= 2>February</option>
-        <option value = 3>March</option>
-        <option value = 4>April</option>
-        <option value = 5>May</option>
-        <option value = 6>June</option>
-        <option value = 7>July</option>
-        <option value = 8>August</option>
-        <option value = 9>September</option>
-        <option value = 10>October</option>
-        <option value = 11>November</option>
-        <option value = 12>December</option>
-      </select><br>
-      <label>Day (1-31):</label>
-      <input type="number" min="1" max="31" name="day" placeholder="Day" required="required"><br>
-      <label>Hours (0-24):</label>
-      <input type="number" min="0" max="24" name="Hours" placeholder="Hours" required="required"><br>
-      <label>Minutes:</label>
-      <input type="number" min="0" max="59" name="Minutes" placeholder="Minutes" required="required"><br>
-      <label>Seconds:</label>
-      <input type="number" min="0" max="59" name="Seconds" placeholder="Seconds" required="required"><br>
-      <button type="submit">Predict</button>
-    </form>
-    <p>{{ prediction_text }}</p>
-  </div>
+
+    <div class="world" id="worldElement">
+        <div class="sky" id="skyElement"></div>
+        <div class="sun-moon" id="celestialBody"></div>
+        <div class="weather-overlay" id="weatherOverlay"></div>
+        
+        <div class="ground">
+            <div class="road">
+                <div class="lane-markings"></div>
+                <div class="car car-1"></div>
+                <div class="car car-2"></div>
+                <div class="car car-3"></div>
+            </div>
+            <div class="grid-lines"></div>
+        </div>
+    </div>
+
+    <div class="hud-container">
+        <header>
+            <div class="logo-area">
+                <h1>TRAFFIC<span class="highlight">TELLIGENCE</span></h1>
+                <div class="status-badge">SYSTEM ONLINE</div>
+            </div>
+            <p>VOLUME ESTIMATION PROTOCOL</p>
+        </header>
+
+        <form action="{{ url_for('predict') }}" method="post" id="trafficForm">
+            
+            <div class="control-panel">
+                <div class="module">
+                    <div class="module-header">TEMPORAL DATA</div>
+                    <div class="form-group">
+                        <label>Date & Time</label>
+                        <input type="datetime-local" id="ui_datetime" required onchange="updateEnvironment()">
+                    </div>
+                </div>
+
+                <div class="module">
+                    <div class="module-header">ENVIRONMENTAL SENSORS</div>
+                    <div class="form-group">
+                        <label>Weather Condition</label>
+                        <select id="ui_weather" required onchange="updateEnvironment()">
+                            <option value="" disabled selected>SCANNING...</option>
+                            <option value="0">Clear Sky</option>
+                            <option value="1">Clouds</option>
+                            <option value="6">Rain</option>
+                            <option value="8">Snow</option>
+                            <option value="5">Mist/Fog</option>
+                            <option value="10">Thunderstorm</option>
+                            <option value="2">Drizzle</option>
+                            <option value="4">Haze</option>
+                            <option value="3">Fog</option>
+                            <option value="9">Squall</option>
+                            <option value="7">Smoke</option>
+                        </select>
+                    </div>
+                    
+                    <div class="split-group">
+                        <div class="form-group">
+                            <label>Temp <span class="unit">(K)</span></label>
+                            <input type="number" id="ui_temp" step="0.01" placeholder="288" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Rain <span class="unit">(mm)</span></label>
+                            <input type="number" id="ui_rain" min="0" max="1000" value="0" required onchange="autoSelectWeather('rain')">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Snow <span class="unit">(mm)</span></label>
+                        <input type="number" id="ui_snow" min="0" max="1000" value="0" required onchange="autoSelectWeather('snow')">
+                    </div>
+                </div>
+
+                <div class="module">
+                    <div class="module-header">EVENT LOGS</div>
+                    <div class="form-group">
+                        <label>Holiday Event</label>
+                        <select id="ui_holiday" required>
+                            <option value="7" selected>None (Standard Traffic)</option>
+                            <option value="1">Columbus Day</option>
+                            <option value="10">Veterans Day</option>
+                            <option value="9">Thanksgiving Day</option>
+                            <option value="0">Christmas Day</option>
+                            <option value="6">New Years Day</option>
+                            <option value="11">Washington's Birthday</option>
+                            <option value="5">Memorial Day</option>
+                            <option value="2">Independence Day</option>
+                            <option value="8">State Fair</option>
+                            <option value="3">Labor Day</option>
+                            <option value="4">Martin Luther King Jr</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" name="holiday" id="h_holiday">
+            <input type="hidden" name="temp" id="h_temp">
+            <input type="hidden" name="rain" id="h_rain">
+            <input type="hidden" name="snow" id="h_snow">
+            <input type="hidden" name="weather" id="h_weather">
+            <input type="hidden" name="Day" id="h_day">
+            <input type="hidden" name="Month" id="h_month">
+            <input type="hidden" name="Year" id="h_year">
+            <input type="hidden" name="Hours" id="h_hours">
+            <input type="hidden" name="Minutes" id="h_minutes">
+            <input type="hidden" name="Seconds" id="h_seconds">
+
+            <button type="submit" class="submit-btn">
+                <span class="btn-text">INITIATE PREDICTION</span>
+                <div class="btn-glitch"></div>
+            </button>
+
+            {% if prediction_text %}
+            <div class="prediction-result">
+                <div class="scan-line"></div>
+                <h3>TRAFFIC DENSITY CALCULATED</h3>
+                <div class="result-value">{{ prediction_text }} <span class="unit">Vehicles/Hour</span></div>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <script>
+        // --- 1. Form Logic (The "Soul") ---
+        window.onload = function() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('ui_datetime').value = now.toISOString().slice(0,16);
+            updateEnvironment(); // Trigger initial visual state
+        };
+
+        const form = document.getElementById('trafficForm');
+
+        form.addEventListener('submit', function(e) {
+            const dtValue = new Date(document.getElementById('ui_datetime').value);
+            
+            // Map UI values to Hidden Inputs
+            document.getElementById('h_holiday').value = document.getElementById('ui_holiday').value;
+            document.getElementById('h_temp').value = document.getElementById('ui_temp').value;
+            document.getElementById('h_rain').value = document.getElementById('ui_rain').value;
+            document.getElementById('h_snow').value = document.getElementById('ui_snow').value;
+            document.getElementById('h_weather').value = document.getElementById('ui_weather').value;
+            
+            document.getElementById('h_day').value = dtValue.getDate();
+            document.getElementById('h_month').value = dtValue.getMonth() + 1;
+            document.getElementById('h_year').value = dtValue.getFullYear();
+            document.getElementById('h_hours').value = dtValue.getHours();
+            document.getElementById('h_minutes').value = dtValue.getMinutes();
+            document.getElementById('h_seconds').value = "0";
+        });
+
+        function autoSelectWeather(type) {
+            const val = document.getElementById('ui_' + type).value;
+            const weatherSelect = document.getElementById('ui_weather');
+            if (val > 0) {
+                if (type === 'rain') weatherSelect.value = "6"; // Rain ID
+                if (type === 'snow') weatherSelect.value = "8"; // Snow ID
+                updateEnvironment();
+            }
+        }
+
+        // --- 2. Gamification Logic (Visuals) ---
+        function updateEnvironment() {
+            const dtInput = document.getElementById('ui_datetime').value;
+            const weatherInput = document.getElementById('ui_weather').value;
+            const date = new Date(dtInput);
+            const hour = date.getHours();
+
+            const world = document.getElementById('worldElement');
+            const sky = document.getElementById('skyElement');
+            const celestial = document.getElementById('celestialBody');
+            const overlay = document.getElementById('weatherOverlay');
+
+            // Day/Night Cycle
+            let isNight = (hour >= 18 || hour < 6);
+            
+            if (isNight) {
+                world.classList.add('night-mode');
+                sky.style.background = "linear-gradient(to bottom, #020024 0%, #090979 35%, #00d4ff 100%)";
+                celestial.style.boxShadow = "0 0 50px #fff"; // Moon glow
+                celestial.style.background = "#ddd"; // Moon color
+            } else {
+                world.classList.remove('night-mode');
+                sky.style.background = "linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%)";
+                celestial.style.boxShadow = "0 0 80px #ffaa00"; // Sun glow
+                celestial.style.background = "#ffdd00"; // Sun color
+            }
+
+            // Weather Particles
+            overlay.className = 'weather-overlay'; // Reset
+            
+            // Rain (IDs: 6, 2, 10, 9)
+            if (['6', '2', '10', '9'].includes(weatherInput)) {
+                overlay.classList.add('rainy');
+            }
+            // Snow (ID: 8)
+            else if (weatherInput === '8') {
+                overlay.classList.add('snowy');
+            }
+            // Fog/Mist (ID: 5, 3, 4, 7)
+            else if (['5', '3', '4', '7'].includes(weatherInput)) {
+                overlay.classList.add('foggy');
+            }
+        }
+    </script>
 </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TrafficTelligence | Command Center</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+  </head>
+  <body>
+    <div class="world" id="worldElement">
+      <div class="sky" id="skyElement"></div>
+      <div class="sun-moon" id="celestialBody"></div>
+      <div class="weather-overlay" id="weatherOverlay"></div>
+
+      <div class="ground">
+        <div class="road">
+          <div class="lane-markings"></div>
+          <div class="car car-1"></div>
+          <div class="car car-2"></div>
+          <div class="car car-3"></div>
+        </div>
+        <div class="grid-lines"></div>
+      </div>
+    </div>
+
+    <div class="hud-container">
+      <header>
+        <div class="logo-area">
+          <h1>TRAFFIC<span class="highlight">TELLIGENCE</span></h1>
+          <div class="status-badge">SYSTEM ONLINE</div>
+        </div>
+        <p>VOLUME ESTIMATION PROTOCOL</p>
+      </header>
+
+      <form action="{{ url_for('predict') }}" method="post" id="trafficForm">
+        <div class="control-panel">
+          <div class="module">
+            <div class="module-header">TEMPORAL DATA</div>
+            <div class="form-group">
+              <label>Date & Time</label>
+              <input
+                type="datetime-local"
+                id="ui_datetime"
+                required
+                onchange="updateEnvironment()"
+              />
+            </div>
+          </div>
+
+          <div class="module">
+            <div class="module-header">ENVIRONMENTAL SENSORS</div>
+            <div class="form-group">
+              <label>Weather Condition</label>
+              <select id="ui_weather" required onchange="updateEnvironment()">
+                <option value="" disabled selected>SCANNING...</option>
+                <option value="0">Clear Sky</option>
+                <option value="1">Clouds</option>
+                <option value="6">Rain</option>
+                <option value="8">Snow</option>
+                <option value="5">Mist/Fog</option>
+                <option value="10">Thunderstorm</option>
+                <option value="2">Drizzle</option>
+                <option value="4">Haze</option>
+                <option value="3">Fog</option>
+                <option value="9">Squall</option>
+                <option value="7">Smoke</option>
+              </select>
+            </div>
+
+            <div class="split-group">
+              <div class="form-group">
+                <label>Temp <span class="unit">(K)</span></label>
+                <input
+                  type="number"
+                  id="ui_temp"
+                  step="0.01"
+                  placeholder="288"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Rain <span class="unit">(mm)</span></label>
+                <input
+                  type="number"
+                  id="ui_rain"
+                  min="0"
+                  max="1000"
+                  value="0"
+                  required
+                  onchange="autoSelectWeather('rain')"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Snow <span class="unit">(mm)</span></label>
+              <input
+                type="number"
+                id="ui_snow"
+                min="0"
+                max="1000"
+                value="0"
+                required
+                onchange="autoSelectWeather('snow')"
+              />
+            </div>
+          </div>
+
+          <div class="module">
+            <div class="module-header">EVENT LOGS</div>
+            <div class="form-group">
+              <label>Holiday Event</label>
+              <select id="ui_holiday" required>
+                <option value="7" selected>None (Standard Traffic)</option>
+                <option value="1">Columbus Day</option>
+                <option value="10">Veterans Day</option>
+                <option value="9">Thanksgiving Day</option>
+                <option value="0">Christmas Day</option>
+                <option value="6">New Years Day</option>
+                <option value="11">Washington's Birthday</option>
+                <option value="5">Memorial Day</option>
+                <option value="2">Independence Day</option>
+                <option value="8">State Fair</option>
+                <option value="3">Labor Day</option>
+                <option value="4">Martin Luther King Jr</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <input type="hidden" name="holiday" id="h_holiday" />
+        <input type="hidden" name="temp" id="h_temp" />
+        <input type="hidden" name="rain" id="h_rain" />
+        <input type="hidden" name="snow" id="h_snow" />
+        <input type="hidden" name="weather" id="h_weather" />
+        <input type="hidden" name="Day" id="h_day" />
+        <input type="hidden" name="Month" id="h_month" />
+        <input type="hidden" name="Year" id="h_year" />
+        <input type="hidden" name="Hours" id="h_hours" />
+        <input type="hidden" name="Minutes" id="h_minutes" />
+        <input type="hidden" name="Seconds" id="h_seconds" />
+
+        <button type="submit" class="submit-btn">
+          <span class="btn-text">INITIATE PREDICTION</span>
+          <div class="btn-glitch"></div>
+        </button>
+
+        {% if prediction_text %}
+        <div class="prediction-result">
+          <div class="scan-line"></div>
+          <h3>TRAFFIC DENSITY CALCULATED</h3>
+          <div class="result-value">
+            {{ prediction_text }} <span class="unit">Vehicles/Hour</span>
+          </div>
+        </div>
+        {% endif %}
+      </form>
+    </div>
+
+    <script>
+      // --- 1. Form Logic (The "Soul") ---
+      window.onload = function () {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById("ui_datetime").value = now
+          .toISOString()
+          .slice(0, 16);
+        updateEnvironment(); // Trigger initial visual state
+      };
+
+      const form = document.getElementById("trafficForm");
+
+      form.addEventListener("submit", function (e) {
+        const dtValue = new Date(document.getElementById("ui_datetime").value);
+
+        // Map UI values to Hidden Inputs
+        document.getElementById("h_holiday").value =
+          document.getElementById("ui_holiday").value;
+        document.getElementById("h_temp").value =
+          document.getElementById("ui_temp").value;
+        document.getElementById("h_rain").value =
+          document.getElementById("ui_rain").value;
+        document.getElementById("h_snow").value =
+          document.getElementById("ui_snow").value;
+        document.getElementById("h_weather").value =
+          document.getElementById("ui_weather").value;
+
+        document.getElementById("h_day").value = dtValue.getDate();
+        document.getElementById("h_month").value = dtValue.getMonth() + 1;
+        document.getElementById("h_year").value = dtValue.getFullYear();
+        document.getElementById("h_hours").value = dtValue.getHours();
+        document.getElementById("h_minutes").value = dtValue.getMinutes();
+        document.getElementById("h_seconds").value = "0";
+      });
+
+      function autoSelectWeather(type) {
+        const val = document.getElementById("ui_" + type).value;
+        const weatherSelect = document.getElementById("ui_weather");
+        if (val > 0) {
+          if (type === "rain") weatherSelect.value = "6"; // Rain ID
+          if (type === "snow") weatherSelect.value = "8"; // Snow ID
+          updateEnvironment();
+        }
+      }
+
+      // --- 2. Gamification Logic (Visuals) ---
+      function updateEnvironment() {
+        const dtInput = document.getElementById("ui_datetime").value;
+        const weatherInput = document.getElementById("ui_weather").value;
+        const date = new Date(dtInput);
+        const hour = date.getHours();
+
+        const world = document.getElementById("worldElement");
+        const sky = document.getElementById("skyElement");
+        const celestial = document.getElementById("celestialBody");
+        const overlay = document.getElementById("weatherOverlay");
+
+        // Day/Night Cycle
+        let isNight = hour >= 18 || hour < 6;
+
+        if (isNight) {
+          world.classList.add("night-mode");
+          sky.style.background =
+            "linear-gradient(to bottom, #020024 0%, #090979 35%, #00d4ff 100%)";
+          celestial.style.boxShadow = "0 0 50px #fff"; // Moon glow
+          celestial.style.background = "#ddd"; // Moon color
+        } else {
+          world.classList.remove("night-mode");
+          sky.style.background =
+            "linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%)";
+          celestial.style.boxShadow = "0 0 80px #ffaa00"; // Sun glow
+          celestial.style.background = "#ffdd00"; // Sun color
+        }
+
+        // Weather Particles
+        overlay.className = "weather-overlay"; // Reset
+
+        // Rain (IDs: 6, 2, 10, 9)
+        if (["6", "2", "10", "9"].includes(weatherInput)) {
+          overlay.classList.add("rainy");
+        }
+        // Snow (ID: 8)
+        else if (weatherInput === "8") {
+          overlay.classList.add("snowy");
+        }
+        // Fog/Mist (ID: 5, 3, 4, 7)
+        else if (["5", "3", "4", "7"].includes(weatherInput)) {
+          overlay.classList.add("foggy");
+        }
+      }
+    </script>
+  </body>
 </html>

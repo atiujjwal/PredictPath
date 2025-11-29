@@ -42,7 +42,7 @@ def predict():
     print(prediction)
     text = "Estimated Traffic volume is: " + str(prediction[0])
     print(text)
-    return render_template("indexh.html", prediction_text=text)
+    return render_template("index.html", prediction_text=text)
 
 
 
